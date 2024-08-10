@@ -12,12 +12,6 @@
 git clone -b openwrt-21.02 --depth=1 https://github.com/hanwckf/immortalwrt-mt798x
 ```
 
-- istore-[linkease/istore](https://github.com/linkease/istore.git).
-
-```bash
-git clone --depth=1 https://github.com/linkease/istore.git
-```
-
 - k9_package-[kiddin9/openwrt-packages](https://github.com/kiddin9/openwrt-packages.git).
 
 ```bash
