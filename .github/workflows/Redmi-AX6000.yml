@@ -110,12 +110,9 @@ jobs:
           previous_tag=$(git --no-pager tag --sort=creatordate | tail -2 | head -1)
           echo "previous_tag: $previous_tag"
           echo "previous_tag=$previous_tag" >> $GITHUB_ENV
-          
-          release_tag=redmi-ax6000-${{ github.ref_name }}
-          release_title="红米AX6000： ${{ github.ref_name }} 版本发布成功 🎉🎉 "
-          
           echo "生成 $previous_tag 到 ${{ github.ref_name }} 的版本日志"
-          echo "release_tag=$release_tag" >> $GITHUB_ENV
+          
+          release_title="红米AX6000： ${{ github.ref_name }} 版本发布成功 🎉🎉 "
           echo "release_title=$release_title" >> $GITHUB_ENV
 
       - name: 生成Release变更日志
@@ -130,7 +127,7 @@ jobs:
       - name: 上传firmware到Release
         uses: softprops/action-gh-release@master
         with:
-          tag_name: ${{ env.release_tag }}
+          tag_name: ${{ github.ref_name }}
           name: ${{ env.release_title }}
           body: ${{ steps.changelog.outputs.changes }}
           files: |
