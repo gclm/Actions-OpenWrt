@@ -1,7 +1,11 @@
 name: Redmi-AX6000
 
 on:
-  repository_dispatch:
+  push:
+    paths:
+      - 'redmi-ax6000/**'
+    tags:
+      - v*
   workflow_dispatch:
 
 env:
@@ -21,6 +25,8 @@ jobs:
     steps:
       - name: 检查项目分支
         uses: actions/checkout@main
+        with:
+          fetch-depth: 0
 
       - name: 初始化编译环境
         env:
@@ -97,20 +103,36 @@ jobs:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
-      - name: 生成release标签
+      - name: 生成Release标签
         id: tag
         if: env.UPLOAD_RELEASE == 'true'
         run: |
-          release_tag=redmi-ax6000-v$(date +"%Y%m%d%H%M")
-          echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
-          echo "🎉🎉 红米AX6000: $release_tag 发布成功" > release.txt
+          previous_tag=$(git --no-pager tag --sort=creatordate | tail -2 | head -1)
+          echo "previous_tag: $previous_tag"
+          echo "previous_tag=$previous_tag" >> $GITHUB_ENV
+          
+          release_tag=redmi-ax6000-${{ github.ref_name }}
+          release_title="红米AX6000： ${{ github.ref_name }} 版本发布成功 🎉🎉 "
+          
+          echo "生成 $previous_tag 到 ${{ github.ref_name }} 的版本日志"
+          echo "release_tag=$release_tag" >> $GITHUB_ENV
+          echo "release_title=$release_title" >> $GITHUB_ENV
+
+      - name: 生成Release变更日志
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          fromTag: ${{ github.ref_name }}
+          toTag: ${{ env.previous_tag }}
+          writeToFile: false
 
       - name: 上传firmware到Release
         uses: softprops/action-gh-release@master
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          name: ${{ steps.tag.outputs.release_tag }}
-          body_path: release.txt
+          tag_name: ${{ env.release_tag }}
+          name: ${{ env.release_title }}
+          body: ${{ steps.changelog.outputs.changes }}
           files: |
             ${{ env.FIRMWARE }}/*
 
