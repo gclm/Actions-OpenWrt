@@ -11,7 +11,7 @@ env:
   CONFIG_FILE: redmi-ax6000/.config
   DIY_P1_SH: redmi-ax6000/diy-part1.sh
   DIY_P2_SH: redmi-ax6000/diy-part2.sh
-  UPLOAD_FIRMWARE: true
+  UPLOAD_ARTIFACT: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -79,43 +79,34 @@ jobs:
           cd openwrt
           echo -e "$(nproc) thread compile"
           make -j$(nproc) V=s
-          echo "status=success" >> $GITHUB_OUTPUT
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-      - name: 检查磁盘使用情况
-        if: (!cancelled())
-        run: df -hT
-
       - name: 整理firmware文件
         id: organize
-        if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         run: |
           cd openwrt/bin/targets/*/*
           rm -rf packages
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-          echo "status=success" >> $GITHUB_OUTPUT
 
-      - name: 上传firmware目录
+      - name: 上传firmware到Artifact
         uses: actions/upload-artifact@main
-        if: steps.organize.outputs.status == 'success' && !cancelled()
+        if: env.UPLOAD_ARTIFACT == 'true'
         with:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
       - name: 生成release标签
         id: tag
-        if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+        if: env.UPLOAD_RELEASE == 'true'
         run: |
           release_tag=redmi-ax6000-v$(date +"%Y%m%d%H%M")
           echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
           echo "🎉🎉 红米AX6000: $release_tag 发布成功" > release.txt
-          echo "status=success" >> $GITHUB_OUTPUT
 
       - name: 上传firmware到Release
         uses: softprops/action-gh-release@master
-        if: steps.tag.outputs.status == 'success' && !cancelled()
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           name: ${{ steps.tag.outputs.release_tag }}
