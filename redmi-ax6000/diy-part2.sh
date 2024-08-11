@@ -19,7 +19,7 @@ sed -i "s/'UTC'/'CST-8'\n                set system.@system[-1].zonename='$utc_n
 echo "修改wifi名称"
 wifi_name=gclm
 sed -i "s/ImmortalWrt/$wifi_name/g" package/kernel/mac80211/files/lib/wifi/mac80211.sh
-sed -i "s/ImmortalWrt-2.4G/$wifi_name-2.4G/g" package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
+sed -i "s/ImmortalWrt-2.4G/$wifi_name/g" package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
 sed -i "s/ImmortalWrt-5G/$wifi_name-5G/g" package/mtk/applications/mtwifi-cfg/files/mtwifi.sh
-sed -i "s/MT7986_AX6000_2.4G/$wifi_name-2.4G/g" package/mtk/drivers/wifi-profile/files/mt7981/mt7981.dbdc.b0.dat
+sed -i "s/MT7986_AX6000_2.4G/$wifi_name/g" package/mtk/drivers/wifi-profile/files/mt7981/mt7981.dbdc.b0.dat
 sed -i "s/MT7986_AX6000_5G/$wifi_name-5G/g" package/mtk/drivers/wifi-profile/files/mt7981/mt7981.dbdc.b1.dat
