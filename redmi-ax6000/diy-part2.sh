@@ -12,9 +12,6 @@ echo "修改时区"
 utc_name='Asia\/Shanghai'
 sed -i "s/'UTC'/'CST-8'\n                set system.@system[-1].zonename='$utc_name/g" package/base-files/files/bin/config_generate
 
-echo "启用ntp"
-sed -i "s/system\.ntp\.enabled=\'1\'/system\.ntp\.enabled=\'0\'/g" package/base-files/files/bin/config_generate
-
 echo "修改界面主题"
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
 
